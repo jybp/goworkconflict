@@ -1,7 +1,7 @@
-module serviceb
+module github.com/jybp/goworkconflict/serviceb
 
 go 1.19
 
-replace goworkconflict/dep v0.0.0 => ../dep
+replace github.com/jybp/goworkconflict/dep v0.0.0 => ../dep
 
-require goworkconflict/dep v0.0.0
+require github.com/jybp/goworkconflict/dep v0.0.0

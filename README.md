@@ -1,4 +1,4 @@
-All services go.mod files point the `goworkconflict/dep` pkg to the same `dep` folder but `servicec` specifies a different relative paths.
+All services `go.mod` files point the `github.com/jybp/goworkconflict/dep` pkg to the same `dep` folder but `servicec` specifies a different relative path.
 
 By default without a `go.work` go tools won't work when ran from the repo root, but will when ran from each module:
 
@@ -8,16 +8,16 @@ $ go test ./...
 pattern ./...: directory prefix . does not contain main module or its selected dependencies
 
 $ go test ./servicea
-go: cannot find main module, but found .git/config in /Users/jean-baptistepinalie/Documents/code/goworkconflict
-        to create a module there, run:
+go: cannot find main module, but found .git/config in /goworkconflict
+        to create a module there, run:go test ./servicea
         go mod init
 
 $ cd ./servicea
 $ go test
 PASS
-ok      servicea        0.102s
+ok      github.com/jybp/goworkconflict/servicea 0.206s
 
-$ cd ../servicea
+$ cd ../
 $ mv go.work.tmp go.work
 ```
 
@@ -28,51 +28,53 @@ $ go test ./...
 pattern ./...: directory prefix . does not contain modules listed in go.work or their selected dependencies
 
 $ go test ./servicea ./serviceb ./dep
-ok      servicea        0.138s
-ok      serviceb        0.098s
-ok      goworkconflict/dep      0.178s
+ok      github.com/jybp/goworkconflict/servicea 0.191s
+ok      github.com/jybp/goworkconflict/serviceb 0.309s
+ok      github.com/jybp/goworkconflict/dep      0.428s
 
 $ cd subfolder/servicec
 $ go test
-directory . is contained in a module that is not one of the workspace modules listed in go.work. You can add the module to the workspace using go work use .
+current directory is contained in a module that is not one of the workspace modules listed in go.work. You can add the module to the workspace using:
+        go work use .
 
-$ cd ..
+$ cd ../../
 $ go work sync
 ```
 
-Adding `dep` in `go.work` makes every test fail
+Adding `dep` in `go.work` has the same results:
 
 ```
 $ go work use dep
 
 $ go test ./...
-go: dep@ used for two different module paths (dep and goworkconflict/dep)
+pattern ./...: directory prefix . does not contain modules listed in go.work or their selected dependencies
 
 $ go test ./servicea ./serviceb ./dep
-go: dep@ used for two different module paths (dep and goworkconflict/dep)
+ok      github.com/jybp/goworkconflict/servicea 0.190s
+ok      github.com/jybp/goworkconflict/serviceb 0.126s
+ok      github.com/jybp/goworkconflict/dep      0.232s
 
+$ cd subfolder/servicec
+$ go test
+current directory is contained in a module that is not one of the workspace modules listed in go.work. You can add the module to the workspace using:
+        go work use .
+
+$ cd ../../
 $ go work sync
-go: dep@ used for two different module paths (dep and goworkconflict/dep)
-go: dep@ used for two different module paths (dep and goworkconflict/dep)
-go: dep@ used for two different module paths (dep and goworkconflict/dep)
 ```
 
-Adding `subfolder/servicec` in `go.work`:
+Adding `subfolder/servicec` in `go.work` produces a new error:
 
 ```
 $ go work use subfolder/servicec
 $ go test ./...     
 
-conflicting replacements found for goworkconflict/dep@v0.0.0 in workspace modules defined by /goworkconflict/serviceb/go.mod and /goworkconflict/subfolder/servicec/go.mod
-conflicting replacements found for goworkconflict/dep@v0.0.0 in workspace modules defined by /goworkconflict/serviceb/go.mod and /goworkconflict/subfolder/servicec/go.mod
+conflicting replacements found for github.com/jybp/goworkconflict/dep@v0.0.0 in workspace modules defined by /goworkconflict/serviceb/go.mod and /goworkconflict/subfolder/servicec/go.mod
 
 $ go work sync
 
-conflicting replacements found for goworkconflict/dep@v0.0.0 in workspace modules defined by /goworkconflict/serviceb/go.mod and /goworkconflict/subfolder/servicec/go.mod
-conflicting replacements found for goworkconflict/dep@v0.0.0 in workspace modules defined by /goworkconflict/serviceb/go.mod and /goworkconflict/subfolder/servicec/go.mod
+conflicting replacements found for github.com/jybp/goworkconflict/dep@v0.0.0 in workspace modules defined by /goworkconflict/serviceb/go.mod and /goworkconflict/subfolder/servicec/go.mod
 ```
-
-Removing `dep` from the go.work (only contains `servicea`, `serviceb`, `subfolder/servicec`) produces the same result.
 
 ------
 
