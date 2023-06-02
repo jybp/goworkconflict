@@ -1,3 +1,7 @@
+Fixed by removing the `v0.0.0` part from all replace directives in all the `go.mod` files.
+
+--------------
+
 All services `go.mod` files point the `github.com/jybp/goworkconflict/dep` pkg to the same `dep` folder but `servicec` specifies a different relative path.
 
 By default without a `go.work` go tools won't work when ran from the repo root, but will when ran from each module:
